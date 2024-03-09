@@ -19,7 +19,7 @@ export const searchMovies = async (req: Request, res: Response) => {
         return res.status(400).json({ error: 'Query parameter "q" is required.' });
       }
   
-      // Use a case-insensitive regular expression for searching titles and genres
+      
       const regex = new RegExp(query.toString(), 'i');
   
       const movies = await Movie.find({
@@ -33,19 +33,22 @@ export const searchMovies = async (req: Request, res: Response) => {
     }
   };
 
-export const addMovie = async (req: Request, res: Response) => {
+export const addMovie = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      // Extract movie details from the request body
+      
       console.log(req.body)
       const { title, genre, rating, streamingLink } = req.body;
       
+      if (req.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Permission denied. Requires "admin" role.' });
+      }
   
-      // Validate required fields
+      
       if (!title || !genre || !rating || !streamingLink) {
         return res.status(400).json({ error: 'All fields are required' });
       }
   
-      // Create a new movie instance
+     
       const newMovie = new Movie({
         title,
         genre,
@@ -53,21 +56,21 @@ export const addMovie = async (req: Request, res: Response) => {
         streamingLink,
       });
   
-      // Save the new movie to the database
+      
       const savedMovie = await newMovie.save();
   
-      // Respond with the saved movie details
+      
       res.status(201).json(savedMovie);
     } catch (error) {
-      // Handle errors, e.g., validation errors or database issues
+      
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };
 
-// Assuming you have a 'user' property attached by the auth middleware
+
 export const updateMovie = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      // Ensure that the request has the "admin" role
+      
       if (req.user?.role !== 'admin') {
         return res.status(403).json({ error: 'Permission denied. Requires "admin" role.' });
       }
@@ -75,7 +78,7 @@ export const updateMovie = async (req: AuthenticatedRequest, res: Response) => {
       const movieId = req.params.id;
       const { title, genre, rating, streamingLink } = req.body;
   
-      // Check if the required fields are present in the request body
+      //
       if (!title && !genre && !rating && !streamingLink) {
         return res.status(400).json({ error: 'At least one field (title, genre, rating, streamingLink) is required for update.' });
       }
@@ -103,10 +106,10 @@ export const updateMovie = async (req: AuthenticatedRequest, res: Response) => {
   };
   
 
-// Assuming you have a 'user' property attached by the auth middleware
+
 export const deleteMovie = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      // Ensure that the request has the "admin" role
+      
       if (req.user?.role !== 'admin') {
         return res.status(403).json({ error: 'Permission denied. Requires "admin" role.' });
       }
