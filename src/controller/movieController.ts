@@ -26,6 +26,7 @@ export const searchMovies = async (req: Request, res: Response) => {
         $or: [{ title: regex }, { genre: regex }],
       });
   
+      
       res.json(movies);
     } catch (error) {
       console.error(error);
